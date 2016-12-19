@@ -1,4 +1,4 @@
-package com.example.fortissimo.myapplication;
+package com.labb2.crow.labb2;
 
 import android.Manifest;
 import android.content.Intent;
@@ -6,6 +6,8 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -29,6 +31,8 @@ public class MainActivity extends AppCompatActivity {
 	private ImageView imageView;
 	public Uri file;
 	public Bitmap bmp;
+	int debugcheck = 0;
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +64,10 @@ public class MainActivity extends AppCompatActivity {
 		file = Uri.fromFile(getOutputMediaFile());
 		intent.putExtra(MediaStore.EXTRA_OUTPUT, file);
 
+
 		startActivityForResult(intent, 100);
+
+
 	}
 
 	@Override
@@ -68,7 +75,13 @@ public class MainActivity extends AppCompatActivity {
 		if (requestCode == 100) {
 			if (resultCode == RESULT_OK) {
 				imageView.setImageURI(file);
-				bmp = BitmapFactory.decodeFile(file.getPath());
+
+				//to be used for better quality in the long future
+				//bmp = BitmapFactory.decodeFile(file.getPath());
+				bmp = ((BitmapDrawable)imageView.getDrawable()).getBitmap();
+				Bitmap tempbitmap = bmp.copy(Bitmap.Config.ARGB_8888,true);
+				bmp = tempbitmap;
+
 			}
 		}
 	}
@@ -89,18 +102,20 @@ public class MainActivity extends AppCompatActivity {
 
 	public void invert(View view) {
 		if ( bmp != null ) {
-			for ( int i = 0; i < bmp.getHeight(); i++ ) {
-				for ( int j = 0; j < bmp.getWidth(); j++ ) {
+			for ( int i = 0; i < 200; i++ ) {
+				for ( int j = 0; j < 200; j++ ) {
 					int clr = bmp.getPixel( i, j );
-					int r = Color.red( clr ) - 255;
-					int g = Color.green( clr ) - 255;
-					int b = Color.blue( clr ) - 255;
+					int r = Color.red( clr ) - Color.red( clr );
+					int g = Color.green( clr ) - Color.green( clr );
+					int b = Color.blue( clr ) - Color.blue( clr );
 					clr = Color.argb( Color.alpha( clr ), r, g, b );
 					bmp.setPixel( i, j, clr);
+					debugcheck = 1;
 				}
 			}
+			imageView.setImageBitmap( bmp );
 		}
-		imageView.setImageBitmap( bmp );
+
 	}
 
 	public void grey_scale(View view) {
@@ -133,4 +148,9 @@ public class MainActivity extends AppCompatActivity {
 			e.printStackTrace();
 		}
 	}
+
+	public void Revert(View view)
+	{}
+	public void Cancel(View view)
+	{}
 }
