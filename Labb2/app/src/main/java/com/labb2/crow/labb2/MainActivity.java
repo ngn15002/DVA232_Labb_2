@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -23,6 +24,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import static android.widget.ImageView.ScaleType.CENTER_INSIDE;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -74,13 +77,19 @@ public class MainActivity extends AppCompatActivity {
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == 100) {
 			if (resultCode == RESULT_OK) {
+
+
 				imageView.setImageURI(file);
+
+
 
 				//to be used for better quality in the long future
 				//bmp = BitmapFactory.decodeFile(file.getPath());
 				bmp = ((BitmapDrawable)imageView.getDrawable()).getBitmap();
 				Bitmap tempbitmap = bmp.copy(Bitmap.Config.ARGB_8888,true);
 				bmp = tempbitmap;
+
+
 
 			}
 		}
@@ -102,15 +111,15 @@ public class MainActivity extends AppCompatActivity {
 
 	public void invert(View view) {
 		if ( bmp != null ) {
-			for ( int i = 0; i < 200; i++ ) {
-				for ( int j = 0; j < 200; j++ ) {
-					int clr = bmp.getPixel( i, j );
-					int r = Color.red( clr ) - Color.red( clr );
-					int g = Color.green( clr ) - Color.green( clr );
-					int b = Color.blue( clr ) - Color.blue( clr );
+			for ( int i = 0; i < bmp.getHeight(); i++ ) {
+				for ( int j = 0; j < bmp.getWidth(); j++ ) {
+					int clr = bmp.getPixel( j, i );
+					int r = 255 - Color.red( clr ) ;
+					int g = 255 - Color.green( clr );
+					int b = 255 -Color.blue( clr );
 					clr = Color.argb( Color.alpha( clr ), r, g, b );
-					bmp.setPixel( i, j, clr);
-					debugcheck = 1;
+					bmp.setPixel( j, i, clr);
+
 				}
 			}
 			imageView.setImageBitmap( bmp );
@@ -119,10 +128,11 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	public void grey_scale(View view) {
+
 		if ( bmp != null ){
 			for ( int i = 0; i < bmp.getHeight(); i++ ) {
 				for ( int j = 0; j < bmp.getWidth(); j++ ) {
-					int clr = bmp.getPixel( i, j );
+					int clr = bmp.getPixel( j, i );
 					int r = Color.red( clr );
 					int g = Color.green( clr );
 					int b = Color.blue( clr );
@@ -130,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
 					int grey = ( r + g + b ) / 3;
 
 					clr = Color.argb( Color.alpha( clr ), grey, grey, grey );
-					bmp.setPixel( i, j, clr);
+					bmp.setPixel( j, i, clr);
 				}
 			}
 		}
@@ -150,7 +160,16 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	public void Revert(View view)
-	{}
+	{
+
+		imageView.setImageURI(file);
+	}
 	public void Cancel(View view)
 	{}
+	private Drawable resize(Drawable image) {
+		Bitmap bitmap = ((BitmapDrawable) image).getBitmap();
+		Bitmap bitmapResized = Bitmap.createScaledBitmap(bitmap,
+				(int) (bitmap.getWidth() * 0.5), (int) (bitmap.getHeight() * 0.5), false);
+		return new BitmapDrawable(getResources(), bitmapResized);
+	}
 }
